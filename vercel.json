@@ -1,0 +1,7 @@
+{
+    "rewrites": [
+      { "source": "/api/send-push", "destination": "/api/send-push.js" },
+      { "source": "/api/save-subscription", "destination": "/api/save-subscription.js" },
+      { "source": "/(.*)", "destination": "/public/index.html" }
+    ]
+  }
