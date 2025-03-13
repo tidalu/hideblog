@@ -209,16 +209,27 @@
       let messages = [];
 
       window.onload = function () {
-        const savedData = JSON.parse(localStorage.getItem("authData"));
-        if (savedData && savedData.expiry > Date.now()) {
-          username = savedData.username;
-          document.getElementById("modal").style.display = "none";
-          fetchBlogAndMessages();
-          if (savedData.push) subscribeUserToPush();
-        }
-        registerServiceWorker();
-      };
-
+  const savedData = JSON.parse(localStorage.getItem("authData"));
+  if (savedData && savedData.expiry > Date.now()) {
+    username = savedData.username;
+    document.getElementById("modal").style.display = "none";
+    fetchBlogAndMessages();
+    if (savedData.push) subscribeUserToPush();
+  }
+  registerServiceWorker();
+  requestNotificationPermission(); // Qo‘shildi
+};
+      function requestNotificationPermission() {
+  if (Notification.permission !== "granted") {
+    Notification.requestPermission().then((permission) => {
+      if (permission === "granted") {
+        subscribeUserToPush();
+      } else {
+        console.log("Notification permission denied");
+      }
+    });
+  }
+}
       function checkPassword() {
         const password = document.getElementById("password").value;
         const inputUsername = document.getElementById("username").value;
