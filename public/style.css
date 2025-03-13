@@ -1,0 +1,318 @@
+/* General Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Body */
+body {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: #fff;
+    min-height: 100vh;
+    margin: 0;
+    padding: 10px; /* Adds space inside the body */
+}
+
+h1 {
+    font-size: 36px;
+    margin: 0 0 20px 0;
+    font-weight: 600;
+}
+
+/* Container */
+#container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 30px; /* Adds space inside the container */
+    min-width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    color: #333;
+}
+
+/* Modals */
+#login-modal, #password-modal, #blog-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;
+}
+
+#modal-content, #password-modal-content {
+    background: white;
+    padding: 30px; /* Adds more space inside modal content */
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Blog Modal */
+#blog-modal-content {
+    background: linear-gradient(145deg, #ffffff, #f0f4f8);
+    padding: 30px; /* Adds more space inside blog modal content */
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 700px;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Blog Title */
+#blog-title {
+    font-size: 28px;
+    color: #1a73e8;
+    margin: 0 0 15px 0;
+    font-weight: 600;
+    text-transform: capitalize;
+    border-bottom: 2px solid #1a73e8;
+    padding-bottom: 5px;
+}
+
+/* Blog Content */
+#blog-content {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #444;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+}
+
+/* Chat Styling */
+#chat {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin: 20px 0;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.message {
+    padding: 15px 20px; /* Slightly larger padding for messages */
+    margin: 10px 0; /* Adds more space between messages */
+    border-radius: 12px;
+    max-width: 75%;
+    position: relative;
+    transition: transform 0.2s ease;
+}
+
+.message:hover {
+    transform: translateY(-2px);
+}
+
+.message.user {
+    background: linear-gradient(135deg, #00f2fe, #4facfe);
+    color: #fff;
+    margin-left: auto;
+    text-align: right;
+}
+
+.message.other {
+    background: #e2e8f0;
+    color: #333;
+    margin-right: auto;
+}
+
+.message .username {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: inherit;
+}
+
+.message .text {
+    word-wrap: break-word;
+}
+
+.message .timestamp {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 5px;
+}
+
+.message.other .timestamp {
+    color: #666;
+}
+
+/* Input and Buttons */
+input, button {
+    margin: 12px 0; /* Adds small space between inputs and buttons */
+    padding: 14px;  /* Adds more padding for better usability */
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    border-color: #1a73e8;
+    outline: none;
+    box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
+}
+
+button {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+button:hover {
+    background: #1557b0;
+    transform: translateY(-1px);
+}
+
+#sendButton {
+    background: #34c759;
+    margin: 10px 0 0 0;
+}
+
+#sendButton:hover {
+    background: #28a745;
+}
+
+/* Blog List Items */
+.blog-item {
+    padding: 25px; /* Adds more padding inside the blog item */
+    margin: 20px 0; /* More space between blog items */
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.blog-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.blog-item h3 {
+    margin: 0 0 10px 0;
+    color: #1a73e8;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+
+
+/* Animation for Modal */
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.no-messages {
+    color: #888;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Skeleton styles */
+.skeleton-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+}
+
+.skeleton-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.skeleton-title {
+    width: 60%;
+    height: 20px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    animation: shimmer 1.5s infinite linear;
+}
+
+.skeleton-text {
+    width: 90%;
+    height: 15px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    margin-top: 10px;
+    animation: shimmer 1.5s infinite linear;
+}
+
+.skeleton-button {
+    width: 100px;
+    height: 30px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    margin-top: 10px;
+    animation: shimmer 1.5s infinite linear;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: 200px 0;
+    }
+}
+
+.skeleton-title,
+.skeleton-text,
+.skeleton-button {
+    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background-size: 200px 100%;
+}
+
+/* Modal Styling */
+#login-modal,
+#password-modal,
+#blog-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#modal-content,
+#password-modal-content,
+#blog-modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
