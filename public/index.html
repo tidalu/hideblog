@@ -16,7 +16,7 @@
           <div id="modal-content">
             <p>Ismingizni kiriting:</p>
             <input type="text" id="username" />
-            <button onclick="saveUsername()">Submit</button>
+            <button id="submitButton">Submit</button>
           </div>
         </div>
   
@@ -46,7 +46,7 @@
           <div id="password-modal-content">
             <p id="blog-password-prompt">Parolni kiriting:</p>
             <input type="password" id="blog-password" />
-            <button onclick="checkBlogPassword()">Submit</button>
+            <button id="passwordSubmit">Submit</button>
             <button
               onclick="document.getElementById('password-modal').style.display = 'none'"
             >
@@ -67,233 +67,12 @@
               placeholder="Xabar yozing..."
               onkeydown="if(event.key === 'Enter') sendMessage()"
             />
-            <button id="sendButton" onclick="sendMessage()">Send</button>
-            <button onclick="closeBlogModal()">Close</button>
+            <button id="sendButton">Send</button>
+            <button id="closeBlogModal">Close</button>
           </div>
         </div>
       <!-- </div> -->
 
-    <script>
-      let username = "";
-      let messages = [];
-      let blogs = [];
-      let currentBlogId = null;
-
-      window.onload = function () {
-        const savedData = JSON.parse(localStorage.getItem("authData"));
-        if (savedData && savedData.expiry > Date.now()) {
-          username = savedData.username;
-          document.getElementById("login-modal").style.display = "none";
-          fetchBlogs();
-        }
-      };
-
-      function saveUsername() {
-        const inputUsername = document.getElementById("username").value;
-        if (inputUsername.trim()) {
-          username = inputUsername;
-          const expiry = Date.now() + 30 * 60 * 1000; // 30 minutes
-          localStorage.setItem(
-            "authData",
-            JSON.stringify({ username, expiry })
-          );
-          document.getElementById("login-modal").style.display = "none";
-          fetchBlogs();
-        } else {
-          alert("Iltimos, ismingizni kiriting!");
-        }
-      }
-
-      
-      function fetchBlogs() {
-          const blogList = document.getElementById("blog-list");
-          const skeleton = document.getElementById("skeleton");
-
-          // Show blog list and skeleton while fetching
-          blogList.style.display = "block";
-          skeleton.style.display = "block";
-
-          fetch(
-            "https://script.google.com/macros/s/AKfycbxaNOYqh4KMrw8-LaPwvwEbRi95zHoTYF-ydEdI6K-wqpj5lKVCIUcsumDgRFO4bVEG8w/exec?sheet=blogs"
-          )
-            .then((response) => {
-              if (!response.ok) throw new Error("Failed to fetch blogs");
-              return response.json();
-            })
-            .then((data) => {
-              blogs = data;
-              displayBlogList();
-            })
-            .catch((error) => {
-              console.error("Error fetching blogs:", error);
-              skeleton.style.display = "none"; // Hide skeleton on error
-              blogList.innerHTML = "<p>Bloglarni yuklashda xatolik yuz berdi.</p>";
-            });
-        }
-
-        function displayBlogList() {
-          const blogList = document.getElementById("blog-list");
-          const skeleton = document.getElementById("skeleton");
-                
-          // Hide skeleton once data is ready
-          skeleton.style.display = "none";
-                
-          blogList.innerHTML = ""; // Clear previous content
-                
-          if (!Array.isArray(blogs)) {
-            console.error("Blogs is not an array:", blogs);
-            blogList.innerHTML = "<p>No blogs available.</p>";
-            return;
-          }
-        
-          blogs.forEach((blog) => {
-            const blogElement = document.createElement("div");
-            blogElement.className = "blog-item";
-            blogElement.innerHTML = `
-              <h3>${blog.title}</h3>
-              <p>${blog.preview}</p>
-              <button onclick="promptBlogPassword('${blog.id}')">Read More</button>
-            `;
-            blogList.appendChild(blogElement);
-          });
-        }
-
-      function promptBlogPassword(blogId) {
-        currentBlogId = blogId;
-        const blog = blogs.find((b) => b.id === blogId);
-        document.getElementById(
-          "blog-password-prompt"
-        ).textContent = `${blog.title} uchun parolni kiriting:`;
-        document.getElementById("blog-password").value = "";
-        document.getElementById("password-modal").style.display = "flex";
-      }
-
-      function checkBlogPassword() {
-        const enteredPassword = document.getElementById("blog-password").value;
-        const blog = blogs.find((b) => b.id === currentBlogId);
-
-        if (enteredPassword === blog.password) {
-          document.getElementById("password-modal").style.display = "none";
-          openBlogModal(currentBlogId);
-        } else {
-          alert("Noto‘g‘ri parol!");
-        }
-      }
-
-      function openBlogModal(blogId) {
-        currentBlogId = blogId; // Ensure currentBlogId is set
-        const blog = blogs.find((b) => b.id === blogId);
-        document.getElementById("blog-title").textContent = blog.title;
-        document.getElementById("blog-content").innerHTML = blog.content;
-        document.getElementById("blog-modal").style.display = "flex";
-
-        // Clear chat and messages array immediately
-        messages = []; // Reset messages to avoid showing old data
-        const chatElement = document.getElementById("chat");
-        chatElement.innerHTML =
-          "<p class='no-messages'>Xabarlar yuklanmoqda...</p>"; // Loading placeholder
-        fetchMessages(blogId);
-      }
-
-      function closeBlogModal() {
-        document.getElementById("blog-modal").style.display = "none";
-        currentBlogId = null;
-      }
-
-      function fetchMessages(blogId) {
-        fetch(
-          "https://script.google.com/macros/s/AKfycbxaNOYqh4KMrw8-LaPwvwEbRi95zHoTYF-ydEdI6K-wqpj5lKVCIUcsumDgRFO4bVEG8w/exec?sheet=messages"
-        )
-          .then((response) => {
-            if (!response.ok) throw new Error("Failed to fetch messages");
-            return response.json();
-          })
-          .then((data) => {
-            console.log("Fetched messages:", data);
-            messages = data.filter((msg) => {
-              const match = msg.blogId === blogId;
-              console.log(
-                `Checking msg.blogId: ${msg.blogId} vs blogId: ${blogId} -> ${match}`
-              );
-              return match;
-            });
-            console.log("Filtered messages:", messages);
-            displayMessages();
-          })
-          .catch((error) => {
-            console.error("Error fetching messages:", error);
-            document.getElementById("chat").innerHTML =
-              "<p class='no-messages'>Xabarlar yuklanmadi</p>";
-          });
-      }
-
-      function sendMessage() {
-        const messageText = document.getElementById("messageInput").value;
-        if (messageText.trim() && currentBlogId) {
-          const timestamp = new Date().toLocaleString().slice(0, 16);
-          const message = {
-            username: username,
-            text: messageText,
-            timestamp: timestamp,
-            blogId: currentBlogId,
-          };
-          messages.push(message);
-          displayMessages();
-          sendToGoogleSheets(message);
-          document.getElementById("messageInput").value = "";
-        }
-      }
-
-      function sendToGoogleSheets(message) {
-        fetch(
-          "https://script.google.com/macros/s/AKfycbxaNOYqh4KMrw8-LaPwvwEbRi95zHoTYF-ydEdI6K-wqpj5lKVCIUcsumDgRFO4bVEG8w/exec?sheet=messages",
-          {
-            method: "POST",
-            mode: "no-cors", // Add this
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ data: [message] }),
-          }
-        )
-          .then(() => console.log("Message sent (no-cors mode)"))
-          .catch((error) => console.error("Error posting message:", error));
-      }
-
-      function displayMessages() {
-        const chatElement = document.getElementById("chat");
-        chatElement.innerHTML = "";
-
-        if (messages.length === 0) {
-          chatElement.innerHTML =
-            "<p class='no-messages'>Hozircha xabarlar yo‘q</p>";
-          return;
-        }
-
-        messages.forEach((message) => {
-          const messageElement = document.createElement("div");
-          messageElement.classList.add("message");
-          messageElement.classList.add(
-            message.username === username ? "user" : "other"
-          );
-          messageElement.innerHTML = `
-            <div class="username">${message.username}</div>
-            <div class="text">${message.text}</div>
-            <div class="timestamp">${message.timestamp}</div>
-        `;
-          chatElement.appendChild(messageElement);
-        });
-        chatElement.scrollTop = chatElement.scrollHeight;
-      }
-
-      setInterval(() => {
-        const savedData = JSON.parse(localStorage.getItem("authData"));
-        if (savedData && savedData.expiry <= Date.now()) {
-          localStorage.removeItem("authData");
-          document.getElementById("login-modal").style.display = "flex";
-          document.getElementById("blog-list").style.display = "none";
-          document.getElementById("blog-modal").style.display = "none";
-          document.getElementById("password-modal").style.display = "none";
-        }
-      }, 60000);
-    </script>
+    <script src="script-obfuscated.js"></script>
   </body>
 </html>

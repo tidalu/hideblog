@@ -16,25 +16,25 @@ body {
     color: #fff;
     min-height: 100vh;
     margin: 0;
-    padding: 10px; /* Adds space inside the body */
-}
-
-h1 {
-    font-size: 36px;
-    margin: 0 0 20px 0;
-    font-weight: 600;
+    padding: 10px;
 }
 
 /* Container */
 #container {
     max-width: 900px;
     margin: 50px auto;
-    padding: 30px; /* Adds space inside the container */
+    padding: 30px;
     min-width: 100%;
     background: rgba(255, 255, 255, 0.95);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     border-radius: 12px;
     color: #333;
+}
+
+h1 {
+    font-size: 36px;
+    margin: 0 0 20px 0;
+    font-weight: 600;
 }
 
 /* Modals */
@@ -53,7 +53,7 @@ h1 {
 
 #modal-content, #password-modal-content {
     background: white;
-    padding: 30px; /* Adds more space inside modal content */
+    padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     width: 90%;
@@ -62,10 +62,9 @@ h1 {
     overflow-y: auto;
 }
 
-/* Blog Modal */
 #blog-modal-content {
     background: linear-gradient(145deg, #ffffff, #f0f4f8);
-    padding: 30px; /* Adds more space inside blog modal content */
+    padding: 30px;
     border-radius: 16px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
     width: 90%;
@@ -79,11 +78,11 @@ h1 {
 /* Blog Title */
 #blog-title {
     font-size: 28px;
-    color: #1a73e8;
+    color: #0088cc;
     margin: 0 0 15px 0;
     font-weight: 600;
     text-transform: capitalize;
-    border-bottom: 2px solid #1a73e8;
+    border-bottom: 2px solid #0088cc;
     padding-bottom: 5px;
 }
 
@@ -96,68 +95,148 @@ h1 {
     white-space: pre-wrap;
 }
 
-/* Chat Styling */
+/* Chat Styling (Telegram-inspired) */
 #chat {
-    background: #f9fafb;
-    border-radius: 10px;
+    background: #f0f2f5; /* Light gray background like Telegram */
+    border-radius: 12px;
     padding: 15px;
     max-height: 400px;
     overflow-y: auto;
     margin: 20px 0;
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Space between messages */
 }
 
 .message {
-    padding: 15px 20px; /* Slightly larger padding for messages */
-    margin: 10px 0; /* Adds more space between messages */
+    padding: 10px 15px;
+    margin: 0; /* Remove default margin for Telegram-like tight layout */
     border-radius: 12px;
-    max-width: 75%;
+    max-width: 70%;
     position: relative;
-    transition: transform 0.2s ease;
+    word-wrap: break-word;
+    transition: background 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .message:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 .message.user {
-    background: linear-gradient(135deg, #00f2fe, #4facfe);
+    background: #0088cc; /* Telegram blue for user messages */
     color: #fff;
-    margin-left: auto;
-    text-align: right;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px; /* Telegram-style corner tweak */
 }
 
 .message.other {
-    background: #e2e8f0;
+    background: #fff; /* White for others, Telegram-like */
     color: #333;
-    margin-right: auto;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px; /* Telegram-style corner tweak */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .message .username {
     font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 5px;
-    color: inherit;
+    font-size: 13px;
+    margin-bottom: 4px;
+    color: #fff; /* White for user messages */
+}
+
+.message.user .username {
+    color: #fff;
+}
+
+.message.other .username {
+    color: #0088cc; /* Blue for others */
 }
 
 .message .text {
-    word-wrap: break-word;
+    font-size: 15px;
+    line-height: 1.4;
 }
 
 .message .timestamp {
     font-size: 11px;
+    opacity: 0.7;
+    margin-top: 4px;
+    text-align: right;
+}
+
+.message.user .timestamp {
     color: rgba(255, 255, 255, 0.8);
-    margin-top: 5px;
 }
 
 .message.other .timestamp {
-    color: #666;
+    color: #888;
+}
+
+/* Reply Preview */
+.reply-preview {
+    background: rgba(0, 0, 0, 0.1); /* Subtle gray for reply preview */
+    padding: 5px 8px;
+    margin-bottom: 8px;
+    border-left: 3px solid #34c759; /* Green accent like Telegram */
+    font-size: 13px;
+    color: #555;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: left;
+}
+
+.message.user .reply-preview {
+    background: rgba(255, 255, 255, 0.2); /* Lighter for user messages */
+    color: #fff;
+}
+
+.reply-preview:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* Reply Button */
+.reply-btn {
+    font-size: 12px;
+    padding: 4px 8px;
+    margin-top: 6px;
+    background: rgba(255, 255, 255, 0.2); /* Transparent button */
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.message.user .reply-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.message.other .reply-btn {
+    background: #e2e8f0;
+    color: #0088cc;
+}
+
+.reply-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.message.other .reply-btn:hover {
+    background: #d1d9e6;
+}
+
+/* Highlighted Message */
+.highlighted {
+    background: #fff3cd !important; /* Warm yellow for highlight */
+    transition: background 0.5s ease;
 }
 
 /* Input and Buttons */
 input, button {
-    margin: 12px 0; /* Adds small space between inputs and buttons */
-    padding: 14px;  /* Adds more padding for better usability */
+    margin: 12px 0;
+    padding: 14px;
     width: 100%;
     border-radius: 8px;
     border: 1px solid #ddd;
@@ -166,13 +245,13 @@ input, button {
 }
 
 input:focus {
-    border-color: #1a73e8;
+    border-color: #0088cc;
     outline: none;
-    box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
+    box-shadow: 0 0 5px rgba(0, 136, 204, 0.3);
 }
 
 button {
-    background: #1a73e8;
+    background: #0088cc;
     color: white;
     border: none;
     cursor: pointer;
@@ -180,12 +259,12 @@ button {
 }
 
 button:hover {
-    background: #1557b0;
+    background: #006699;
     transform: translateY(-1px);
 }
 
 #sendButton {
-    background: #34c759;
+    background: #34c759; /* Telegram green */
     margin: 10px 0 0 0;
 }
 
@@ -195,8 +274,8 @@ button:hover {
 
 /* Blog List Items */
 .blog-item {
-    padding: 25px; /* Adds more padding inside the blog item */
-    margin: 20px 0; /* More space between blog items */
+    padding: 25px;
+    margin: 20px 0;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -210,12 +289,10 @@ button:hover {
 
 .blog-item h3 {
     margin: 0 0 10px 0;
-    color: #1a73e8;
+    color: #0088cc;
     font-size: 20px;
     font-weight: 600;
 }
-
-
 
 /* Animation for Modal */
 @keyframes slideIn {
@@ -276,7 +353,6 @@ button:hover {
     animation: shimmer 1.5s infinite linear;
 }
 
-/* Shimmer animation */
 @keyframes shimmer {
     0% {
         background-position: -200px 0;
@@ -291,28 +367,4 @@ button:hover {
 .skeleton-button {
     background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
     background-size: 200px 100%;
-}
-
-/* Modal Styling */
-#login-modal,
-#password-modal,
-#blog-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#modal-content,
-#password-modal-content,
-#blog-modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-    text-align: center;
 }
