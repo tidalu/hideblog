@@ -235,7 +235,7 @@
         const inputUsername = document.getElementById("username").value;
         const pushPermission = document.getElementById("pushCheckbox").checked;
 
-        if (password === "burchak") {
+        if (password === process.env.password) { // Vercel env variable sifatida qo'shiladi
           username = inputUsername;
           const expiry = Date.now() + 30 * 60 * 1000; // 30 daqiqa
           const authData = { username: username, expiry: expiry, push: pushPermission };
