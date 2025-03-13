@@ -29,8 +29,10 @@ function saveUsername() {
     fetchBlogs();
   } else {
     alert("Iltimos, ismingizni kiriting!");
+    
   }
 }
+
 
 function fetchBlogs() {
   const blogList = document.getElementById("blog-list");
