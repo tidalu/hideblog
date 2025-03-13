@@ -23,7 +23,7 @@ function saveUsername() {
   const inputUsername = document.getElementById("username").value;
   if (inputUsername.trim()) {
     username = inputUsername;
-    const expiry = Date.now() + 30 * 60 * 1000;
+    const expiry = Date.now() + 365 * 24 * 60 * 60 * 1000;
     localStorage.setItem("authData", JSON.stringify({ username, expiry }));
     document.getElementById("login-modal").style.display = "none";
     fetchBlogs();
