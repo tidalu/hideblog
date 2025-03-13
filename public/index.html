@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ulugbek #burchak</title>
     <style>
-      /* Oldingi CSS o'zgarishsiz qoldi */
       body {
         display: flex;
         justify-content: flex-start;
@@ -27,7 +26,141 @@
         display: flex;
         flex-direction: column;
       }
-      /* Boshqa CSS qismlar o'zgarishsiz */
+      h1 {
+        font-size: 28px;
+        color: #222;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      #modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+        width: 90%;
+        max-width: 500px;
+      }
+      #modal-content p {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+      input,
+      button {
+        margin-top: 15px;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        width: 100%;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 20px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      #consentCheckbox {
+        margin-top: 15px;
+      }
+      #disclaimer {
+        display: none;
+        margin-top: 10px;
+        font-size: 14px;
+        color: #444;
+      }
+
+      /* Styling for chat messages */
+      .mesgContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-height: 400px;
+        overflow-y: auto;
+        margin-top: 20px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+      }
+      #chat {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 10px;
+      }
+      .message {
+        background-color: #f1f1f1;
+        border-radius: 12px;
+        padding: 10px 15px;
+        margin-bottom: 15px;
+        max-width: 75%;
+        text-align: left;
+        display: block;
+        word-wrap: break-word;
+        position: relative;
+      }
+      .message.user {
+        background-color: #00f2fe;
+        align-self: flex-end;
+        justify-self: flex-end;
+      }
+      .message.other {
+        background-color: #ddd;
+        justify-self: flex-start;
+      }
+      .message .username {
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+      .message .timestamp {
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+      }
+
+      #messageInput {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        width: 90%;
+        margin-top: 15px;
+      }
+
+      #sendButton {
+        background: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 90%;
+        padding: 12px;
+        margin-top: 10px;
+      }
+
+      #sendButton:hover {
+        background: #0056b3;
+      }
     </style>
   </head>
   <body>
